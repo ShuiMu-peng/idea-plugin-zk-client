@@ -2,15 +2,15 @@ package com.lipeng.window;
 
 import cn.hutool.core.util.StrUtil;
 import com.intellij.icons.AllIcons;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.treeStructure.Tree;
 import com.lipeng.consts.GlobalConstants;
 import com.lipeng.dialog.InsertHostDialog;
+import com.lipeng.util.MsgUtil;
 import com.lipeng.util.ZkUtil;
 import com.lipeng.window.listener.AddChildSelectionListener;
 import com.lipeng.window.listener.RightMouseClickListen;
@@ -37,9 +37,8 @@ public class ZkWindow {
     private JToolBar toolBar;
     private ComboBox<String> zkHostListComBox;
     private final DefaultActionGroup actionGroup = new DefaultActionGroup();
-    private final Project project;
-    public ZkWindow(Project project, ToolWindow toolWindow) {
-        this.project = project;
+
+    public ZkWindow() {
         scrollPane.setBorder(BorderFactory.createLineBorder(JBColor.lightGray, 1));
         scrollPane2.setBorder(BorderFactory.createLineBorder(JBColor.lightGray, 1));
 
@@ -65,12 +64,12 @@ public class ZkWindow {
     }
 
     private void initRemoveButton() {
-        actionGroup.add(new AnAction("Remove Current Configuration ", "Remove current configuration", AllIcons.Actions.RemoveMulticaret) {
+        actionGroup.add(new AnAction("Remove Current Configuration ", "Remove current configuration", AllIcons.General.Remove) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 String host = String.valueOf(zkHostListComBox.getSelectedItem());
                 if (GlobalConstants.CLOSE_ITEM.equals(host)) {
-                    Messages.showWarningDialog("This item can not be removed", "Tip");
+                    MsgUtil.print("Insert success", NotificationType.INFORMATION);
                     return;
                 }
 
@@ -85,7 +84,7 @@ public class ZkWindow {
     }
 
     private void initAddButton() {
-        actionGroup.add(new AnAction("Add Config", "Add zookeeper config", AllIcons.Actions.AddMulticaret) {
+        actionGroup.add(new AnAction("Add Config", "Add zookeeper config", AllIcons.General.Add) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 new InsertHostDialog(zkHostListComBox).show();
@@ -115,7 +114,7 @@ public class ZkWindow {
         // 选中节点展示节点详情
         dataTree.addTreeSelectionListener(new ShowDataInfoSelectionListener(nodeTableInfo, dataTree));
         // 鼠标右键展示操作
-        dataTree.addMouseListener(new RightMouseClickListen(dataTree, project));
+        dataTree.addMouseListener(new RightMouseClickListen(dataTree));
     }
 
     private void updateTree(String host) {
@@ -128,8 +127,6 @@ public class ZkWindow {
         if (dataTree.getModel().getRoot().equals(host)) {
             return;
         }
-
-        // loading
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(host);
         DefaultTreeModel treeModel = new DefaultTreeModel(root);

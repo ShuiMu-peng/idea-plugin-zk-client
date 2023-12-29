@@ -1,14 +1,12 @@
 package com.lipeng.window.listener;
 
-import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.wm.ToolWindowId;
 import com.lipeng.dialog.InsertNodeDialog;
 import com.lipeng.dialog.UpdateNodeDialog;
+import com.lipeng.util.MsgUtil;
 import com.lipeng.util.ZkUtil;
 
 import javax.swing.*;
@@ -23,11 +21,9 @@ import java.awt.event.MouseEvent;
  */
 public class RightMouseClickListen extends MouseAdapter {
     private final JTree dataTree;
-    private final Project project;
 
-    public RightMouseClickListen(JTree dataTree, Project project) {
+    public RightMouseClickListen(JTree dataTree) {
         this.dataTree = dataTree;
-        this.project = project;
     }
 
     @Override
@@ -89,9 +85,9 @@ public class RightMouseClickListen extends MouseAdapter {
                     boolean b = ZkUtil.deleteNode(String.valueOf(model.getRoot()), selectedNode);
                     if (b) {
                         model.removeNodeFromParent(selectedNode);
-                        new Notification(ToolWindowId.PROJECT_VIEW, "Delete success", NotificationType.INFORMATION).notify(project);
+                        MsgUtil.print("Delete success", NotificationType.INFORMATION);
                     } else {
-                        Messages.showMessageDialog("Delete failed", "Error", Messages.getErrorIcon());
+                        MsgUtil.print("Delete failed", NotificationType.ERROR);
                     }
                 }
             }
@@ -105,7 +101,7 @@ public class RightMouseClickListen extends MouseAdapter {
             @Override
             public void actionPerformed(ActionEvent e) {
                 DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) dataTree.getLastSelectedPathComponent();
-                new UpdateNodeDialog(dataTree, selectedNode, project).show();
+                new UpdateNodeDialog(dataTree, selectedNode).show();
             }
         });
         popupMenu.add(menuItem);
@@ -117,7 +113,7 @@ public class RightMouseClickListen extends MouseAdapter {
             @Override
             public void actionPerformed(ActionEvent e) {
                 DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) dataTree.getLastSelectedPathComponent();
-                new InsertNodeDialog(dataTree, selectedNode, project).show();
+                new InsertNodeDialog(dataTree, selectedNode).show();
             }
         });
         popupMenu.add(menuItem);

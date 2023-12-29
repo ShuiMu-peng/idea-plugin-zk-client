@@ -28,7 +28,7 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.lipeng.window.ZookeeperToolWindowFactory" id="zkToolWindow" anchor="right"
+        <toolWindow factoryClass="com.lipeng.window.ZookeeperToolWindowFactory" id="zookeeperTool" anchor="right"
                     icon="/img/log.png"/>
     </extensions>
     <actions>

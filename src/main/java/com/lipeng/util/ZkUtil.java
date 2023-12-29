@@ -5,6 +5,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.notification.NotificationType;
 import com.lipeng.consts.GlobalConstants;
 import com.lipeng.entity.ZkNodeInfo;
 import lombok.SneakyThrows;
@@ -16,7 +17,6 @@ import org.apache.zookeeper.data.Stat;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,9 +29,10 @@ public class ZkUtil {
      */
     private static final Set<String> ZK_HOST = new LinkedHashSet<>();
     private static final Map<String, ZooKeeper> ZK_INSTANCE = new HashMap<>();
+    public static final String COM_LIPENG_ZK_HOST = "com:lipeng:zk:host";
 
     static {
-        List<String> list = PropertiesComponent.getInstance().getList("com:lipeng:zk:host");
+        List<String> list = PropertiesComponent.getInstance().getList(COM_LIPENG_ZK_HOST);
         System.out.println("init list:" + list);
         if (CollectionUtil.isNotEmpty(list)) {
             ZK_HOST.addAll(list);
@@ -40,25 +41,36 @@ public class ZkUtil {
 
     public static void addHost(String host) {
         ZK_HOST.add(host);
-        PropertiesComponent.getInstance().setList("com:lipeng:zk:host", ZK_HOST);
+        PropertiesComponent.getInstance().setList(COM_LIPENG_ZK_HOST, ZK_HOST);
     }
 
     public static void removeHost(String host) {
         ZK_HOST.remove(host);
-        PropertiesComponent.getInstance().setList("com:lipeng:zk:host", ZK_HOST);
+        if (isInit(host)) {
+            IoUtil.close(getZkInstance(host));
+        }
+        PropertiesComponent.getInstance().setList(COM_LIPENG_ZK_HOST, ZK_HOST);
     }
 
     public static Set<String> getAllHost() {
         return ZK_HOST;
     }
 
+    public static boolean isInit(String host) {
+        return ZK_HOST.contains(host);
+    }
+
     public static ZooKeeper getZkInstance(String host) {
         return ZK_INSTANCE.computeIfAbsent(host, k -> {
+            ZooKeeper zk = null;
             try {
-                return new ZooKeeper(host, 60 * 1000, null);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
+                zk = new ZooKeeper(host, 5 * 1000, null);
+                zk.getChildren("/", false);
+                return zk;
+            } catch (Exception e) {
+                IoUtil.close(zk);
+                MsgUtil.print("connect zookeeper error," + e.getMessage(), NotificationType.ERROR);
+                throw new RuntimeException(e);
             }
         });
     }
@@ -118,7 +130,7 @@ public class ZkUtil {
             getZkInstance(host).create(selectNodePath + path, data.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            MsgUtil.print(e.getMessage(), NotificationType.ERROR);
         }
         return false;
     }
@@ -128,7 +140,7 @@ public class ZkUtil {
             getZkInstance(host).setData(path, data.getBytes(), -1);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            MsgUtil.print(e.getMessage(), NotificationType.ERROR);
         }
         return false;
     }
@@ -139,7 +151,7 @@ public class ZkUtil {
             getZkInstance(host).delete(selectNodePath, -1);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            MsgUtil.print(e.getMessage(), NotificationType.ERROR);
         }
         return false;
     }

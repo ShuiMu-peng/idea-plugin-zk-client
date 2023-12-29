@@ -1,12 +1,10 @@
 package com.lipeng.dialog;
 
 import cn.hutool.core.util.StrUtil;
-import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.wm.ToolWindowId;
+import com.lipeng.util.MsgUtil;
 import com.lipeng.util.ZkUtil;
 
 import javax.swing.*;
@@ -23,15 +21,13 @@ public class InsertNodeDialog extends DialogWrapper {
     JTextField dataField;
     private final JTree dataTree;
     private final DefaultMutableTreeNode selectedNode;
-    private final Project project;
 
-    public InsertNodeDialog(JTree dataTree, DefaultMutableTreeNode selectedNode, Project project) {
+    public InsertNodeDialog(JTree dataTree, DefaultMutableTreeNode selectedNode) {
         super(true);
         super.setSize(350, 180);
 
         setTitle("输入节点信息");
 
-        this.project = project;
         this.dataTree = dataTree;
         this.selectedNode = selectedNode;
 
@@ -74,9 +70,9 @@ public class InsertNodeDialog extends DialogWrapper {
         if (result) {
             selectedNode.add(new DefaultMutableTreeNode(path));
             model.nodeStructureChanged(selectedNode);
-            new Notification(ToolWindowId.PROJECT_VIEW, "Insert success", NotificationType.INFORMATION).notify(project);
+            MsgUtil.print("Insert success", NotificationType.INFORMATION);
         } else {
-            new Notification(ToolWindowId.PROJECT_VIEW, "Insert error", NotificationType.ERROR).notify(project);
+            MsgUtil.print("Insert failed", NotificationType.ERROR);
         }
         this.close(0);
     }

@@ -1,12 +1,10 @@
 package com.lipeng.dialog;
 
 import cn.hutool.core.util.StrUtil;
-import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.wm.ToolWindowId;
+import com.lipeng.util.MsgUtil;
 import com.lipeng.util.ZkUtil;
 
 import javax.swing.*;
@@ -27,15 +25,13 @@ public class UpdateNodeDialog extends DialogWrapper {
     private final JTree dataTree;
     private final DefaultMutableTreeNode selectedNode;
     private final String host;
-    private final Project project;
 
-    public UpdateNodeDialog(JTree dataTree, DefaultMutableTreeNode selectedNode, Project project) {
+    public UpdateNodeDialog(JTree dataTree, DefaultMutableTreeNode selectedNode) {
         super(true);
         super.setSize(350, 180);
 
         setTitle("修改节点信息");
 
-        this.project = project;
         this.dataTree = dataTree;
         this.selectedNode = selectedNode;
         DefaultTreeModel model = (DefaultTreeModel) dataTree.getModel();
@@ -83,9 +79,9 @@ public class UpdateNodeDialog extends DialogWrapper {
         if (result) {
             TreeSelectionEvent selectionEvent = new TreeSelectionEvent(dataTree, new TreePath(selectedNode.getPath()), true, null, null);
             Arrays.stream(dataTree.getTreeSelectionListeners()).forEach(listener -> listener.valueChanged(selectionEvent));
-            new Notification(ToolWindowId.PROJECT_VIEW, "Update success", NotificationType.INFORMATION).notify(project);
+            MsgUtil.print("Update success", NotificationType.INFORMATION);
         } else {
-            new Notification(ToolWindowId.PROJECT_VIEW, "Update error", NotificationType.ERROR).notify(project);
+            MsgUtil.print("Update failed", NotificationType.ERROR);
         }
         this.close(0);
     }

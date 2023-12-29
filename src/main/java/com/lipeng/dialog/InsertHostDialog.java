@@ -67,6 +67,7 @@ public class InsertHostDialog extends DialogWrapper {
         }
         ZkUtil.addHost(host);
         ZkUtil.refreshZkList(zkHostList);
+        zkHostList.setSelectedItem(host);
         this.close(0);
     }
 }
