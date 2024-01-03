@@ -69,7 +69,7 @@ public class ZkWindow {
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 String host = String.valueOf(zkHostListComBox.getSelectedItem());
                 if (GlobalConstants.CLOSE_ITEM.equals(host)) {
-                    MsgUtil.print("Insert success", NotificationType.INFORMATION);
+                    MsgUtil.print("The default configuration cannot be removed", NotificationType.WARNING);
                     return;
                 }
 

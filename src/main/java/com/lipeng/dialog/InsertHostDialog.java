@@ -1,9 +1,11 @@
 package com.lipeng.dialog;
 
 import cn.hutool.core.util.StrUtil;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.JBColor;
+import com.lipeng.util.MsgUtil;
 import com.lipeng.util.ZkUtil;
 
 import javax.swing.*;
@@ -67,7 +69,11 @@ public class InsertHostDialog extends DialogWrapper {
         }
         ZkUtil.addHost(host);
         ZkUtil.refreshZkList(zkHostList);
-        zkHostList.setSelectedItem(host);
+        try {
+            zkHostList.setSelectedItem(host);
+        } catch (Exception e) {
+            MsgUtil.print("this config init error!" + e.getMessage(), NotificationType.ERROR);
+        }
         this.close(0);
     }
 }
