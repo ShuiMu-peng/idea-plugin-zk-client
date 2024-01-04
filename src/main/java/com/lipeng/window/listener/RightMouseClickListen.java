@@ -73,6 +73,7 @@ public class RightMouseClickListen extends MouseAdapter {
                 DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) dataTree.getLastSelectedPathComponent();
                 selectedNode.removeAllChildren();
                 ZkUtil.initChild(String.valueOf(dataTree.getModel().getRoot()), selectedNode, 0);
+                dataTree.updateUI();
             }
         });
         popupMenu.add(menuItem);
