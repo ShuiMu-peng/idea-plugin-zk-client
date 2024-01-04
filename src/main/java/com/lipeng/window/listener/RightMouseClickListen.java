@@ -4,6 +4,7 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.openapi.ui.Messages;
+import com.lipeng.consts.GlobalConstants;
 import com.lipeng.dialog.InsertNodeDialog;
 import com.lipeng.dialog.UpdateNodeDialog;
 import com.lipeng.util.MsgUtil;
@@ -33,6 +34,10 @@ public class RightMouseClickListen extends MouseAdapter {
 
     private void process(MouseEvent e) {
         if (e.getButton() != 3) {
+            return;
+        }
+
+        if (GlobalConstants.isCloseMsg(String.valueOf(dataTree.getModel().getRoot()))) {
             return;
         }
 

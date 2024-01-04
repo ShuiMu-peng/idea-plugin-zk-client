@@ -26,7 +26,7 @@ public class AddChildSelectionListener implements TreeSelectionListener {
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         String host = String.valueOf(dataTree.getModel().getRoot());
-        if (CollectionUtil.isEmpty(ZkUtil.getAllHost()) || host.equals(GlobalConstants.CLOSE_MSG)) {
+        if (CollectionUtil.isEmpty(ZkUtil.getAllHost()) || GlobalConstants.isCloseMsg(host)) {
             return;
         }
 

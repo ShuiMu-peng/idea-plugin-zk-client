@@ -97,11 +97,17 @@ public class ZkWindow {
         zkHostListComBox.setPreferredSize(new Dimension(200, 30));
         ZkUtil.initZkList(zkHostListComBox);
         zkHostListComBox.addActionListener(new AbstractAction() {
+            private String lastSelectedHost = "";
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 @SuppressWarnings("unchecked")
                 JComboBox<String> source = (JComboBox<String>) e.getSource();
                 String root = (String) source.getSelectedItem();
+                if (StrUtil.equals(root, lastSelectedHost)) {
+                    return;
+                }
+                lastSelectedHost = root;
                 updateTree(root);
             }
         });
