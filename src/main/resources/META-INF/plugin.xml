@@ -24,6 +24,15 @@
         </ul>
         ]]>
     </description>
+    <change-notes>
+        <![CDATA[
+      <b>1.0.1</b> 2024/01/04
+      <ul>
+        <li> fix bug</li>
+        <li> Added the deletion of non-leaf nodes </li>
+      </ul>
+    ]]>
+    </change-notes>
 
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
