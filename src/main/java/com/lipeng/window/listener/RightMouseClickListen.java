@@ -45,7 +45,6 @@ public class RightMouseClickListen extends MouseAdapter {
         int row = dataTree.getClosestRowForLocation(e.getX(), e.getY());
         dataTree.setSelectionRow(row);
 
-        // JPopupMenu popupMenu = new JPopupMenu();
         JBPopupMenu popupMenu = new JBPopupMenu();
 
         initAddMethod(popupMenu);
@@ -53,11 +52,7 @@ public class RightMouseClickListen extends MouseAdapter {
         if (row != 0) {
             initUpdateMethod(popupMenu);
 
-            // 仅叶子节点允许删除
-            DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) dataTree.getLastSelectedPathComponent();
-            if (selectedNode.isLeaf()) {
-                initDeleteMethod(popupMenu);
-            }
+            initDeleteMethod(popupMenu);
         }
 
         initRefreshMethod(popupMenu);
@@ -85,10 +80,10 @@ public class RightMouseClickListen extends MouseAdapter {
             @Override
             public void actionPerformed(ActionEvent e) {
                 DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) dataTree.getLastSelectedPathComponent();
-                int yesNoDialog = Messages.showYesNoDialog("Confirm to delete this node？[" + ZkUtil.getSelectNodePath(selectedNode) + "]", "Tip", Messages.getQuestionIcon());
+                int yesNoDialog = Messages.showYesNoDialog("Confirm to delete this node and its child nodes？[" + ZkUtil.getSelectNodePath(selectedNode) + "]", "Tip", Messages.getQuestionIcon());
                 if (yesNoDialog == JOptionPane.YES_OPTION) {
                     DefaultTreeModel model = (DefaultTreeModel) dataTree.getModel();
-                    boolean b = ZkUtil.deleteNode(String.valueOf(model.getRoot()), selectedNode);
+                    boolean b = ZkUtil.deleteNode(String.valueOf(model.getRoot()), ZkUtil.getSelectNodePath(selectedNode));
                     if (b) {
                         model.removeNodeFromParent(selectedNode);
                         MsgUtil.print("Delete success", NotificationType.INFORMATION);

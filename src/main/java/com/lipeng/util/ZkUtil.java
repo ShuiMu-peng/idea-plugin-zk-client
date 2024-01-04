@@ -147,6 +147,9 @@ public class ZkUtil {
         return false;
     }
 
+    /**
+     * 修改节点数据
+     */
     public static boolean updateNode(String host, String path, String data) {
         try {
             getZkInstance(host).setData(path, data.getBytes(), -1);
@@ -157,10 +160,18 @@ public class ZkUtil {
         return false;
     }
 
-    public static boolean deleteNode(String host, DefaultMutableTreeNode selectedNode) {
+    /**
+     * 递归删除节点数据
+     */
+    public static boolean deleteNode(String host, String path) {
         try {
-            String selectNodePath = getSelectNodePath(selectedNode);
-            getZkInstance(host).delete(selectNodePath, -1);
+            List<String> child = getChild(host, path);
+            if (CollectionUtil.isNotEmpty(child)) {
+                for (String childPath : child) {
+                    deleteNode(host, path + StrUtil.SLASH + childPath);
+                }
+            }
+            getZkInstance(host).delete(path, -1);
             return true;
         } catch (Exception e) {
             MsgUtil.print(e.getMessage(), NotificationType.ERROR);
@@ -168,6 +179,10 @@ public class ZkUtil {
         return false;
     }
 
+
+    /**
+     * 刷新配置的zk列表
+     */
     public static void refreshZkList(JComboBox<String> zkHostList) {
         initZkList(zkHostList);
     }
