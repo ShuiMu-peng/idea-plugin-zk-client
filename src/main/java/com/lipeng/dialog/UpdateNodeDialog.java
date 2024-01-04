@@ -30,7 +30,7 @@ public class UpdateNodeDialog extends DialogWrapper {
         super(true);
         super.setSize(350, 180);
 
-        setTitle("修改节点信息");
+        setTitle("Update Node");
 
         this.dataTree = dataTree;
         this.selectedNode = selectedNode;

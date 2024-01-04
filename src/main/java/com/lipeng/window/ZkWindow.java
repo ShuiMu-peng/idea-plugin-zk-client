@@ -94,7 +94,7 @@ public class ZkWindow {
     }
 
     private void initZkHostList() {
-        zkHostListComBox.setPreferredSize(new Dimension(200, 30));
+        zkHostListComBox.setPreferredSize(new Dimension(170, 30));
         ZkUtil.initZkList(zkHostListComBox);
         zkHostListComBox.addActionListener(new AbstractAction() {
             private String lastSelectedHost = "";
