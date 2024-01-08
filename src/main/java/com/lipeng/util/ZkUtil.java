@@ -44,11 +44,16 @@ public class ZkUtil {
         PropertiesComponent.getInstance().setList(COM_LIPENG_ZK_HOST, ZK_HOST);
     }
 
+    public static void closeHost(String host) {
+        if (ZK_HOST.contains(host)) {
+            IoUtil.close(ZK_INSTANCE.remove(host));
+        }
+    }
+
     public static void removeHost(String host) {
         ZK_HOST.remove(host);
-        if (isInit(host)) {
-            ZooKeeper zooKeeper = ZK_INSTANCE.remove(host);
-            IoUtil.close(zooKeeper);
+        if (ZK_HOST.contains(host)) {
+            IoUtil.close(ZK_INSTANCE.remove(host));
         }
         PropertiesComponent.getInstance().setList(COM_LIPENG_ZK_HOST, ZK_HOST);
     }
@@ -57,16 +62,12 @@ public class ZkUtil {
         return ZK_HOST;
     }
 
-    public static boolean isInit(String host) {
-        return ZK_HOST.contains(host);
-    }
-
     public static ZooKeeper getZkInstance(String host) {
         ZooKeeper zooKeeper = ZK_INSTANCE.computeIfAbsent(host, k -> {
             ZooKeeper zk = null;
             try {
                 zk = new ZooKeeper(host, 5 * 1000, null);
-                zk.exists("/", false);
+                zk.exists(StrUtil.SLASH, false);
                 return zk;
             } catch (Exception e) {
                 IoUtil.close(zk);
@@ -76,9 +77,8 @@ public class ZkUtil {
         });
 
         // 测试是否可用,可能超时导致不可用
-        // TODO: 2024/1/4 后续优化此逻辑
         try {
-            zooKeeper.exists("/", false);
+            zooKeeper.exists(StrUtil.SLASH, false);
         } catch (Exception e) {
             MsgUtil.print("refresh connect zookeeper " + host, NotificationType.WARNING);
             IoUtil.close(ZK_INSTANCE.remove(host));

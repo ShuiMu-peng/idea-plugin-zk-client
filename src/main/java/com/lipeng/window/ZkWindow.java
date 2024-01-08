@@ -16,6 +16,7 @@ import com.lipeng.window.listener.AddChildSelectionListener;
 import com.lipeng.window.listener.RightMouseClickListen;
 import com.lipeng.window.listener.ShowDataInfoSelectionListener;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -27,6 +28,7 @@ import java.awt.event.ActionEvent;
 /**
  * @author lipeng 2023/12/20
  */
+@Slf4j
 public class ZkWindow {
     private Tree dataTree;
     @Getter
@@ -37,6 +39,7 @@ public class ZkWindow {
     private JToolBar toolBar;
     private ComboBox<String> zkHostListComBox;
     private final DefaultActionGroup actionGroup = new DefaultActionGroup();
+    private AnAction disconnectButton;
 
     public ZkWindow() {
         scrollPane.setBorder(BorderFactory.createLineBorder(JBColor.lightGray, 1));
@@ -49,7 +52,6 @@ public class ZkWindow {
         initZkHostList();
     }
 
-
     private void initToolBar() {
         toolBar.setFloatable(false);
         ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar("zk", actionGroup, true);
@@ -60,7 +62,22 @@ public class ZkWindow {
 
         initRemoveButton();
 
-        System.out.println("init tool bar");
+        // init disconnectButton,默认不添加到 toolBar
+        initDisconnectButton();
+        log.debug("init tool bar");
+    }
+
+    private void initDisconnectButton() {
+        disconnectButton = new AnAction("Disconnect", "Disconnect", AllIcons.Actions.Suspend) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                String host = String.valueOf(zkHostListComBox.getSelectedItem());
+                ZkUtil.closeHost(host);
+
+                zkHostListComBox.setSelectedIndex(0);
+                actionGroup.remove(disconnectButton);
+            }
+        };
     }
 
     private void initRemoveButton() {
@@ -97,18 +114,25 @@ public class ZkWindow {
         zkHostListComBox.setPreferredSize(new Dimension(170, 30));
         ZkUtil.initZkList(zkHostListComBox);
         zkHostListComBox.addActionListener(new AbstractAction() {
-            private String lastSelectedHost = "";
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 @SuppressWarnings("unchecked")
                 JComboBox<String> source = (JComboBox<String>) e.getSource();
                 String root = (String) source.getSelectedItem();
-                if (StrUtil.equals(root, lastSelectedHost)) {
+                if (StrUtil.isBlank(root) || StrUtil.equals(root, GlobalConstants.CLOSE_ITEM)) {
+                    dataTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode(GlobalConstants.CLOSE_MSG)));
+                    dataTree.updateUI();
                     return;
                 }
-                lastSelectedHost = root;
+
+                // 重新渲染树
                 updateTree(root);
+
+                // 初始化关闭链接的按钮
+                if (!actionGroup.containsAction(disconnectButton)) {
+                    actionGroup.add(disconnectButton);
+                    actionGroup.addSeparator();
+                }
             }
         });
         zkHostListComBox.setSelectedItem(zkHostListComBox.getItemAt(0));
@@ -124,12 +148,6 @@ public class ZkWindow {
     }
 
     private void updateTree(String host) {
-        if (StrUtil.isBlank(host) || StrUtil.equals(host, GlobalConstants.CLOSE_ITEM)) {
-            dataTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode(GlobalConstants.CLOSE_MSG)));
-            dataTree.updateUI();
-            return;
-        }
-
         if (dataTree.getModel().getRoot().equals(host)) {
             return;
         }
