@@ -27,12 +27,10 @@
 
     <change-notes>
         <![CDATA[
-          <b>1.0.1</b> 2024/01/04
-          <ul>
-            <li> fix bug</li>
-            <li> Added the deletion of non-leaf nodes </li>
-          </ul>
-        ]]>
+      <ul>
+        <li><b>0.1</b> Initial release. Basic theme functionality.</li>
+      </ul>
+    ]]>
     </change-notes>
 
     <!-- Product and plugin compatibility requirements.
