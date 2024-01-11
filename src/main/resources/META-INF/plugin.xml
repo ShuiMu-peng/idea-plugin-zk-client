@@ -28,7 +28,8 @@
     <change-notes>
         <![CDATA[
       <ul>
-        <li><b>0.1</b> Initial release. Basic theme functionality.</li>
+        <li><b>1.0.1</b> Non-leaf nodes can be deleted </li>
+        <li><b>1.0.2</b> Added manually disconnecting zookeeper </li>
       </ul>
     ]]>
     </change-notes>
